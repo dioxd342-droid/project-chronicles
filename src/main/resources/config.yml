@@ -20,6 +20,10 @@ economy:
   starting-balance: 100
   currency-name: 'монет'
 
+npc:
+  storyteller:
+    enabled: true
+
 world-events:
   enabled: true
   broadcast: true
