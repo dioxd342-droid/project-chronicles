@@ -16,9 +16,17 @@ public final class NpcInteractionListener implements Listener {
     public void onInteract(PlayerInteractEntityEvent event) {
         if (!(event.getRightClicked() instanceof Villager villager) || !npcService.isStoryteller(villager)) return;
         event.setCancelled(true);
-        event.getPlayer().sendMessage(ChatColor.GOLD + "Элиан: " + ChatColor.WHITE + "Хроники снова открываются. Перед тобой два пути.");
-        event.getPlayer().sendMessage(ChatColor.YELLOW + "/chronicles choose wardens" + ChatColor.GRAY + " — помочь Стражам защитить город.");
-        event.getPlayer().sendMessage(ChatColor.YELLOW + "/chronicles choose traders" + ChatColor.GRAY + " — поддержать Вольных торговцев.");
-        event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Твой первый выбор повлияет на отношение фракций к тебе.");
+        String choice = plugin.getDecisionService().get(event.getPlayer(), "origin_faction");
+        if (choice != null) {
+            event.getPlayer().sendMessage(ChatColor.GOLD + "Элиан: " + ChatColor.WHITE + "Я помню твой путь. Хроники уже меняются вокруг тебя.");
+            event.getPlayer().sendMessage(ChatColor.GRAY + "Твой путь: " + ChatColor.YELLOW + choice);
+            event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "/chronicles quests — посмотреть доступные задания.");
+            return;
+        }
+        event.getPlayer().sendMessage(ChatColor.GOLD + "Элиан: " + ChatColor.WHITE + "Хроники снова открываются. Перед тобой три пути.");
+        event.getPlayer().sendMessage(ChatColor.YELLOW + "/chronicles choose wardens" + ChatColor.GRAY + " — Стражи: порядок и защита городов.");
+        event.getPlayer().sendMessage(ChatColor.YELLOW + "/chronicles choose traders" + ChatColor.GRAY + " — Торговцы: свобода, караваны и богатство.");
+        event.getPlayer().sendMessage(ChatColor.YELLOW + "/chronicles choose seekers" + ChatColor.GRAY + " — Искатели: руины, тайны и древние знания.");
+        event.getPlayer().sendMessage(ChatColor.DARK_GRAY + "Первый выбор повлияет на дальнейшие квесты и репутацию.");
     }
 }
