@@ -3,20 +3,17 @@ version: ${version}
 main: com.projectchronicles.core.ChroniclesPlugin
 api-version: '26.2'
 author: Project Chronicles
-
 description: Original Minecraft MMORPG where players change the world through their actions.
-
 commands:
   chronicles:
     description: Main Project Chronicles command
-    usage: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|xp]
+    usage: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|cosmetics|grantcosmetic|xp]
     aliases: [pc]
     permission: chronicles.use
-
 permissions:
   chronicles.use:
     description: Allows use of the main Chronicles command
     default: true
   chronicles.admin:
-    description: Allows administrative progression testing
+    description: Allows administrative progression and cosmetic testing
     default: op
