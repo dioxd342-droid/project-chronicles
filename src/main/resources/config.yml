@@ -14,3 +14,12 @@ profile:
 progression:
   base-experience: 100
   experience-growth: 50
+  max-level: 100
+
+economy:
+  starting-balance: 100
+  currency-name: 'монет'
+
+world-events:
+  enabled: true
+  broadcast: true
