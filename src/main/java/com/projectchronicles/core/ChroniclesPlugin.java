@@ -2,6 +2,7 @@ package com.projectchronicles.core;
 
 import com.projectchronicles.core.command.ChroniclesCommand;
 import com.projectchronicles.core.listener.PlayerJoinListener;
+import com.projectchronicles.core.listener.PlayerQuitListener;
 import com.projectchronicles.core.player.PlayerManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +26,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getLogger().info("Project Chronicles loaded.");
     }
 
