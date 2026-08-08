@@ -21,7 +21,7 @@ public final class ExperienceService {
         int levelsGained = 0;
         while (profile.getExperience() >= experienceRequiredForNextLevel(profile.getLevel())) {
             long required = experienceRequiredForNextLevel(profile.getLevel());
-            profile.addExperience(-required);
+            profile.removeExperience(required);
             profile.setLevel(profile.getLevel() + 1);
             levelsGained++;
         }
