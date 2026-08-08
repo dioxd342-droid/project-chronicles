@@ -23,10 +23,6 @@ public final class ChroniclesCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ChatColor.GRAY + "Твои решения меняют твою историю.");
             return true;
         }
-        if (args[0].equalsIgnoreCase("donate") || args[0].equalsIgnoreCase("store")) {
-            showDonate(sender);
-            return true;
-        }
         if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "Эта команда доступна только игроку.");
             return true;
@@ -39,21 +35,12 @@ public final class ChroniclesCommand implements CommandExecutor, TabCompleter {
             case "choose" -> chooseFaction(player, args);
             case "factions", "reputation", "rep" -> showFactions(player);
             case "decision" -> showDecision(player);
+            case "donate", "donation" -> plugin.getDonationService().showDonationInfo(player);
+            case "store", "shop" -> plugin.getDonationService().showStore(player);
             case "xp" -> addTestExperience(player, args);
-            default -> player.sendMessage(ChatColor.RED + "Использование: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|xp]");
+            default -> player.sendMessage(ChatColor.RED + "Использование: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|xp]");
         }
         return true;
-    }
-
-    private void showDonate(CommandSender sender) {
-        if (!plugin.getConfig().getBoolean("donation.enabled", true)) {
-            sender.sendMessage(ChatColor.GRAY + "Магазин временно недоступен.");
-            return;
-        }
-        sender.sendMessage(ChatColor.GOLD + "=== Project Chronicles Store ===");
-        sender.sendMessage(ChatColor.YELLOW + "Магазин: " + ChatColor.WHITE + plugin.getConfig().getString("donation.store-url", "https://example.com"));
-        sender.sendMessage(ChatColor.GRAY + "Покупки выдаются автоматически после подтверждения оплаты.");
-        sender.sendMessage(ChatColor.DARK_GRAY + "Поддержка проекта добровольная.");
     }
 
     private void showProfile(Player player) {
