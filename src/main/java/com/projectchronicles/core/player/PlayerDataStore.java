@@ -24,6 +24,7 @@ public final class PlayerDataStore {
         if (!file.exists()) return new PlayerProfile(uniqueId, level, experience, balance);
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
         PlayerProfile profile = new PlayerProfile(uniqueId, data.getInt("level", level), data.getLong("experience", experience), data.getLong("balance", balance));
+        profile.setPlayerClass(data.getString("class", "SEEKER"));
         profile.loadCompletedQuests(new HashSet<>(data.getStringList("quests.completed")));
         profile.loadQuestProgress(readQuestProgress(data));
         profile.loadCosmetics(new HashSet<>(data.getStringList("cosmetics.owned")), new HashSet<>(data.getStringList("cosmetics.equipped")));
@@ -38,14 +39,10 @@ public final class PlayerDataStore {
     public void save(PlayerProfile profile) {
         File file = new File(directory, profile.getUniqueId() + ".yml");
         YamlConfiguration data = new YamlConfiguration();
-        data.set("uuid", profile.getUniqueId().toString());
-        data.set("level", profile.getLevel());
-        data.set("experience", profile.getExperience());
-        data.set("balance", profile.getBalance());
+        data.set("uuid", profile.getUniqueId().toString()); data.set("level", profile.getLevel()); data.set("experience", profile.getExperience()); data.set("balance", profile.getBalance()); data.set("class", profile.getPlayerClass());
         data.set("quests.completed", profile.getCompletedQuests());
         for (Map.Entry<String, Integer> entry : profile.getQuestProgress().entrySet()) data.set("quests.progress." + entry.getKey(), entry.getValue());
-        data.set("cosmetics.owned", profile.getOwnedCosmetics());
-        data.set("cosmetics.equipped", profile.getEquippedCosmetics());
+        data.set("cosmetics.owned", profile.getOwnedCosmetics()); data.set("cosmetics.equipped", profile.getEquippedCosmetics());
         try { data.save(file); } catch (IOException exception) { plugin.getLogger().severe("Could not save profile " + profile.getUniqueId() + ": " + exception.getMessage()); }
     }
 }
