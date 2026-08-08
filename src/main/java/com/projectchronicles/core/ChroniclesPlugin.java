@@ -6,6 +6,8 @@ import com.projectchronicles.core.faction.FactionService;
 import com.projectchronicles.core.listener.PlayerActivityListener;
 import com.projectchronicles.core.listener.PlayerJoinListener;
 import com.projectchronicles.core.listener.PlayerQuitListener;
+import com.projectchronicles.core.npc.NpcInteractionListener;
+import com.projectchronicles.core.npc.NpcService;
 import com.projectchronicles.core.player.ExperienceService;
 import com.projectchronicles.core.player.PlayerManager;
 import com.projectchronicles.core.quest.QuestService;
@@ -17,16 +19,19 @@ public final class ChroniclesPlugin extends JavaPlugin {
     private EconomyService economyService;
     private QuestService questService;
     private FactionService factionService;
+    private NpcService npcService;
     @Override public void onEnable() {
         saveDefaultConfig();
         playerManager = new PlayerManager(this); playerManager.initialize();
-        experienceService = new ExperienceService(this); economyService = new EconomyService(this); questService = new QuestService(this); factionService = new FactionService(this);
+        experienceService = new ExperienceService(this); economyService = new EconomyService(this); questService = new QuestService(this); factionService = new FactionService(this); npcService = new NpcService(this);
         ChroniclesCommand command = new ChroniclesCommand(this);
         if (getCommand("chronicles") != null) { getCommand("chronicles").setExecutor(command); getCommand("chronicles").setTabCompleter(command); }
         else getLogger().severe("Command 'chronicles' is missing from plugin.yml");
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this);
+        getServer().getPluginManager().registerEvents(new NpcInteractionListener(this, npcService), this);
+        npcService.spawnStorytellerIfNeeded();
         getLogger().info("Project Chronicles loaded.");
     }
     @Override public void onDisable() { if (playerManager != null) playerManager.shutdown(); getLogger().info("Project Chronicles disabled."); }
