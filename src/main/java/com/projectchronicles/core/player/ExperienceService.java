@@ -8,18 +8,18 @@ public final class ExperienceService {
 
     private final ChroniclesPlugin plugin;
 
-    public ExperienceService(ChroniclesPlugin plugin) {
-        this.plugin = plugin;
-    }
+    public ExperienceService(ChroniclesPlugin plugin) { this.plugin = plugin; }
 
     public boolean addExperience(Player player, long amount) {
         if (amount <= 0) return false;
 
         PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
-        profile.addExperience(amount);
+        int maxLevel = plugin.getConfig().getInt("progression.max-level", 100);
+        if (profile.getLevel() >= maxLevel) return false;
 
+        profile.addExperience(amount);
         int levelsGained = 0;
-        while (profile.getExperience() >= experienceRequiredForNextLevel(profile.getLevel())) {
+        while (profile.getLevel() < maxLevel && profile.getExperience() >= experienceRequiredForNextLevel(profile.getLevel())) {
             long required = experienceRequiredForNextLevel(profile.getLevel());
             profile.removeExperience(required);
             profile.setLevel(profile.getLevel() + 1);
