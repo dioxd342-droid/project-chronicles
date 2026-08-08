@@ -10,3 +10,7 @@ spawn:
 profile:
   starting-level: 1
   starting-experience: 0
+
+progression:
+  base-experience: 100
+  experience-growth: 50
