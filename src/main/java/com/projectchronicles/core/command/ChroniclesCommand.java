@@ -37,8 +37,9 @@ public final class ChroniclesCommand implements CommandExecutor, TabCompleter {
             case "decision" -> showDecision(player);
             case "donate", "donation" -> plugin.getDonationService().showDonationInfo(player);
             case "store", "shop" -> plugin.getDonationService().showStore(player);
+            case "cosmetics", "cosmetic", "collection" -> plugin.getCosmeticService().showCollection(player);
             case "xp" -> addTestExperience(player, args);
-            default -> player.sendMessage(ChatColor.RED + "Использование: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|xp]");
+            default -> player.sendMessage(ChatColor.RED + "Использование: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|cosmetics|xp]");
         }
         return true;
     }
@@ -100,7 +101,7 @@ public final class ChroniclesCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1) return List.of("info", "profile", "balance", "quests", "claim", "choose", "factions", "decision", "donate", "store", "xp").stream().filter(v -> v.startsWith(args[0].toLowerCase())).toList();
+        if (args.length == 1) return List.of("info", "profile", "balance", "quests", "claim", "choose", "factions", "decision", "donate", "store", "cosmetics", "xp").stream().filter(v -> v.startsWith(args[0].toLowerCase())).toList();
         if (args.length == 2 && args[0].equalsIgnoreCase("claim")) return plugin.getQuestService().getQuests().stream().map(Quest::id).toList();
         if (args.length == 2 && args[0].equalsIgnoreCase("choose")) return plugin.getFactionService().getFactions().stream().map(Faction::id).toList();
         return List.of();
