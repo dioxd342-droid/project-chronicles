@@ -1,0 +1,12 @@
+# Project Chronicles configuration
+
+messages:
+  prefix: '&6[&eChronicles&6] &r'
+  welcome: '&6Добро пожаловать в &eProject Chronicles&6!'
+
+spawn:
+  enabled: true
+
+profile:
+  starting-level: 1
+  starting-experience: 0
