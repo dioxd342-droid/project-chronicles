@@ -30,15 +30,16 @@ world-events:
 
 donation:
   enabled: true
-  store-url: 'https://YOUR-CHRONICLES-STORE.tebex.io'
-  provider: 'Tebex'
-  packages:
-    scout:
-      display-name: 'Хроникёр'
-      description: 'Косметические возможности и поддержка проекта.'
+  store-url: ''
+  currency: 'EUR'
+  pay-to-win: false
+  products:
+    chronikler:
+      price: '4.99'
+      title: 'Хроникёр'
     guardian:
-      display-name: 'Хранитель'
-      description: 'Дополнительные косметические возможности и поддержка проекта.'
+      price: '9.99'
+      title: 'Хранитель'
     founder:
-      display-name: 'Основатель'
-      description: 'Премиальный косметический набор для поддержки проекта.'
+      price: '19.99'
+      title: 'Основатель'
