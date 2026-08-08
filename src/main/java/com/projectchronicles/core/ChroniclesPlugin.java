@@ -1,6 +1,7 @@
 package com.projectchronicles.core;
 
 import com.projectchronicles.core.command.ChroniclesCommand;
+import com.projectchronicles.core.decision.DecisionService;
 import com.projectchronicles.core.economy.EconomyService;
 import com.projectchronicles.core.faction.FactionService;
 import com.projectchronicles.core.listener.PlayerActivityListener;
@@ -22,13 +23,25 @@ public final class ChroniclesPlugin extends JavaPlugin {
     private FactionService factionService;
     private NpcService npcService;
     private WorldEventService worldEventService;
+    private DecisionService decisionService;
+
     @Override public void onEnable() {
         saveDefaultConfig();
         playerManager = new PlayerManager(this); playerManager.initialize();
-        experienceService = new ExperienceService(this); economyService = new EconomyService(this); questService = new QuestService(this); factionService = new FactionService(this); npcService = new NpcService(this); worldEventService = new WorldEventService(this);
+        experienceService = new ExperienceService(this);
+        economyService = new EconomyService(this);
+        questService = new QuestService(this);
+        factionService = new FactionService(this);
+        npcService = new NpcService(this);
+        worldEventService = new WorldEventService(this);
+        decisionService = new DecisionService(this);
+
         ChroniclesCommand command = new ChroniclesCommand(this);
-        if (getCommand("chronicles") != null) { getCommand("chronicles").setExecutor(command); getCommand("chronicles").setTabCompleter(command); }
-        else getLogger().severe("Command 'chronicles' is missing from plugin.yml");
+        if (getCommand("chronicles") != null) {
+            getCommand("chronicles").setExecutor(command);
+            getCommand("chronicles").setTabCompleter(command);
+        } else getLogger().severe("Command 'chronicles' is missing from plugin.yml");
+
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this);
@@ -37,11 +50,17 @@ public final class ChroniclesPlugin extends JavaPlugin {
         worldEventService.start();
         getLogger().info("Project Chronicles loaded.");
     }
-    @Override public void onDisable() { if (worldEventService != null) worldEventService.stop(); if (playerManager != null) playerManager.shutdown(); getLogger().info("Project Chronicles disabled."); }
+
+    @Override public void onDisable() {
+        if (worldEventService != null) worldEventService.stop();
+        if (playerManager != null) playerManager.shutdown();
+        getLogger().info("Project Chronicles disabled.");
+    }
     public PlayerManager getPlayerManager() { return playerManager; }
     public ExperienceService getExperienceService() { return experienceService; }
     public EconomyService getEconomyService() { return economyService; }
     public QuestService getQuestService() { return questService; }
     public FactionService getFactionService() { return factionService; }
     public WorldEventService getWorldEventService() { return worldEventService; }
+    public DecisionService getDecisionService() { return decisionService; }
 }
