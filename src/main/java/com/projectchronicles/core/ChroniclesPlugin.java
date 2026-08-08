@@ -1,6 +1,7 @@
 package com.projectchronicles.core;
 
 import com.projectchronicles.core.combat.ClassService;
+import com.projectchronicles.core.combat.CombatListener;
 import com.projectchronicles.core.command.ChroniclesCommand;
 import com.projectchronicles.core.cosmetic.CosmeticListener;
 import com.projectchronicles.core.cosmetic.CosmeticPetService;
@@ -40,6 +41,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this);
+        getServer().getPluginManager().registerEvents(new CombatListener(this), this);
         getServer().getPluginManager().registerEvents(new NpcInteractionListener(this, npcService), this);
         getServer().getPluginManager().registerEvents(new CosmeticListener(this, cosmeticService), this);
         getServer().getPluginManager().registerEvents(new ProgressQuestListener(this, progressQuestService), this);
