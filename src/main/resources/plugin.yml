@@ -9,7 +9,7 @@ description: Original Minecraft MMORPG where players change the world through th
 commands:
   chronicles:
     description: Main Project Chronicles command
-    usage: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|xp]
+    usage: /chronicles [info|profile|balance|quests|claim|choose|factions|decision|donate|store|xp]
     aliases: [pc]
     permission: chronicles.use
 
