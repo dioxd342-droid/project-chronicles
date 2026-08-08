@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import java.util.List;
 
 public final class CosmeticService {
@@ -26,79 +25,36 @@ public final class CosmeticService {
     );
     public CosmeticService(ChroniclesPlugin plugin) { this.plugin = plugin; }
     public List<Cosmetic> getCosmetics() { return cosmetics; }
-
     public void openMenu(Player player) {
         Inventory inv = Bukkit.createInventory(null, 27, GUI_TITLE);
         PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
         for (int i = 0; i < cosmetics.size(); i++) {
-            Cosmetic cosmetic = cosmetics.get(i);
-            Material material = cosmetic.type() == Cosmetic.CosmeticType.TITLE ? Material.NAME_TAG : cosmetic.type() == Cosmetic.CosmeticType.PARTICLE ? Material.GLOWSTONE_DUST : Material.AMETHYST_SHARD;
-            ItemStack item = new ItemStack(material);
-            ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName((profile.ownsCosmetic(cosmetic.id()) ? "§a" : "§7§m") + cosmetic.name());
-            meta.setLore(List.of(
-                    "§7" + cosmetic.description(),
-                    "",
-                    profile.ownsCosmetic(cosmetic.id()) ? (profile.getEquippedCosmetics().contains(cosmetic.id()) ? "§eНажми, чтобы снять" : "§aНажми, чтобы надеть") : "§cНе получено"
-            ));
-            meta.getPersistentDataContainer().set(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING, cosmetic.id());
-            item.setItemMeta(meta);
-            inv.setItem(i + 10, item);
+            Cosmetic c = cosmetics.get(i); Material material = c.type() == Cosmetic.CosmeticType.TITLE ? Material.NAME_TAG : c.type() == Cosmetic.CosmeticType.PARTICLE ? Material.GLOWSTONE_DUST : Material.AMETHYST_SHARD;
+            ItemStack item = new ItemStack(material); ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName((profile.ownsCosmetic(c.id()) ? "§a" : "§7§m") + c.name());
+            meta.setLore(List.of("§7" + c.description(), "", profile.ownsCosmetic(c.id()) ? (profile.getEquippedCosmetics().contains(c.id()) ? "§eНажми, чтобы снять" : "§aНажми, чтобы надеть") : "§cНе получено"));
+            meta.getPersistentDataContainer().set(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING, c.id()); item.setItemMeta(meta); inv.setItem(i + 10, item);
         }
         player.openInventory(inv);
     }
-
     public void handleClick(Player player, ItemStack item) {
         if (item == null || !item.hasItemMeta()) return;
-        String id = item.getItemMeta().getPersistentDataContainer().get(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING);
-        if (id == null) return;
-        PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
-        Cosmetic cosmetic = cosmetics.stream().filter(c -> c.id().equals(id)).findFirst().orElse(null);
-        if (cosmetic == null || !profile.ownsCosmetic(id)) {
-            player.sendMessage("§cЭта косметика ещё не принадлежит тебе.");
-            return;
+        String id = item.getItemMeta().getPersistentDataContainer().get(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING); if (id == null) return;
+        PlayerProfile p = plugin.getPlayerManager().getProfile(player.getUniqueId()); Cosmetic c = cosmetics.stream().filter(x -> x.id().equals(id)).findFirst().orElse(null);
+        if (c == null || !p.ownsCosmetic(id)) { player.sendMessage("§cЭта косметика ещё не принадлежит тебе."); return; }
+        if (p.getEquippedCosmetics().contains(id)) { p.unequipCosmetic(id); player.sendMessage("§7Косметика снята: §f" + c.name()); }
+        else {
+            if (c.type() == Cosmetic.CosmeticType.TITLE) p.getEquippedCosmetics().stream().filter(x -> x.startsWith("title_")).toList().forEach(p::unequipCosmetic);
+            if (c.type() == Cosmetic.CosmeticType.PARTICLE) p.getEquippedCosmetics().stream().filter(x -> x.startsWith("particle_")).toList().forEach(p::unequipCosmetic);
+            p.equipCosmetic(id); player.sendMessage("§aКосметика надета: §f" + c.name());
         }
-        if (profile.getEquippedCosmetics().contains(id)) {
-            profile.unequipCosmetic(id);
-            player.sendMessage("§7Косметика снята: §f" + cosmetic.name());
-        } else {
-            if (cosmetic.type() == Cosmetic.CosmeticType.TITLE) {
-                profile.getEquippedCosmetics().stream().filter(existing -> existing.startsWith("title_")).toList().forEach(profile::unequipCosmetic);
-            }
-            if (cosmetic.type() == Cosmetic.CosmeticType.PARTICLE) {
-                profile.getEquippedCosmetics().stream().filter(existing -> existing.startsWith("particle_")).toList().forEach(profile::unequipCosmetic);
-            }
-            profile.equipCosmetic(id);
-            player.sendMessage("§aКосметика надета: §f" + cosmetic.name());
-        }
-        apply(player);
-        openMenu(player);
+        apply(player); plugin.getCosmeticPetService().refresh(player); openMenu(player);
     }
-
-    public void grant(Player player, String id) {
-        Cosmetic cosmetic = cosmetics.stream().filter(c -> c.id().equals(id)).findFirst().orElse(null);
-        if (cosmetic == null) { player.sendMessage("§cНеизвестная косметика: " + id); return; }
-        plugin.getPlayerManager().getProfile(player.getUniqueId()).grantCosmetic(id);
-        player.sendMessage("§aПолучена косметика: §f" + cosmetic.name());
-    }
-
+    public void grant(Player player, String id) { Cosmetic c = cosmetics.stream().filter(x -> x.id().equals(id)).findFirst().orElse(null); if (c == null) { player.sendMessage("§cНеизвестная косметика: " + id); return; } plugin.getPlayerManager().getProfile(player.getUniqueId()).grantCosmetic(id); player.sendMessage("§aПолучена косметика: §f" + c.name()); }
     public void apply(Player player) {
-        PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
-        String title = profile.getEquippedCosmetics().stream().filter(id -> id.startsWith("title_")).findFirst().orElse(null);
-        String prefix = title == null ? "" : switch (title) {
-            case "title_chronikler" -> "§6[Хроникёр] §r";
-            case "title_guardian" -> "§b[Хранитель] §r";
-            case "title_founder" -> "§d[Основатель] §r";
-            default -> "";
-        };
+        PlayerProfile p = plugin.getPlayerManager().getProfile(player.getUniqueId()); String title = p.getEquippedCosmetics().stream().filter(x -> x.startsWith("title_")).findFirst().orElse(null);
+        String prefix = title == null ? "" : switch (title) { case "title_chronikler" -> "§6[Хроникёр] §r"; case "title_guardian" -> "§b[Хранитель] §r"; case "title_founder" -> "§d[Основатель] §r"; default -> ""; };
         player.setPlayerListName(prefix + player.getName());
     }
-
-    public void tickEffects() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
-            if (profile.getEquippedCosmetics().contains("particle_embers")) player.getWorld().spawnParticle(Particle.FLAME, player.getLocation().add(0, 1, 0), 3, .25, .35, .25, .01);
-            if (profile.getEquippedCosmetics().contains("particle_stars")) player.getWorld().spawnParticle(Particle.END_ROD, player.getLocation().add(0, 1.2, 0), 2, .3, .4, .3, .01);
-        }
-    }
+    public void tickEffects() { for (Player p : Bukkit.getOnlinePlayers()) { PlayerProfile profile = plugin.getPlayerManager().getProfile(p.getUniqueId()); if (profile.getEquippedCosmetics().contains("particle_embers")) p.getWorld().spawnParticle(Particle.FLAME, p.getLocation().add(0,1,0), 3, .25,.35,.25,.01); if (profile.getEquippedCosmetics().contains("particle_stars")) p.getWorld().spawnParticle(Particle.END_ROD, p.getLocation().add(0,1.2,0), 2, .3,.4,.3,.01); } }
 }
