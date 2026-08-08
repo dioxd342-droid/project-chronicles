@@ -1,6 +1,8 @@
 package com.projectchronicles.core.player;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,6 +12,7 @@ public final class PlayerProfile {
     private long experience;
     private long balance;
     private final Set<String> completedQuests = new HashSet<>();
+    private final Map<String, Integer> questProgress = new HashMap<>();
     private final Set<String> ownedCosmetics = new HashSet<>();
     private final Set<String> equippedCosmetics = new HashSet<>();
 
@@ -24,9 +27,13 @@ public final class PlayerProfile {
     public long getExperience() { return experience; }
     public long getBalance() { return balance; }
     public Set<String> getCompletedQuests() { return Set.copyOf(completedQuests); }
+    public Map<String, Integer> getQuestProgress() { return Map.copyOf(questProgress); }
+    public int getQuestProgress(String id) { return questProgress.getOrDefault(id, 0); }
     public Set<String> getOwnedCosmetics() { return Set.copyOf(ownedCosmetics); }
     public Set<String> getEquippedCosmetics() { return Set.copyOf(equippedCosmetics); }
     public void loadCompletedQuests(Set<String> quests) { completedQuests.clear(); if (quests != null) completedQuests.addAll(quests); }
+    public void loadQuestProgress(Map<String, Integer> progress) { questProgress.clear(); if (progress != null) questProgress.putAll(progress); }
+    public void setQuestProgress(String id, int value) { if (id != null) questProgress.put(id, Math.max(0, value)); }
     public void loadCosmetics(Set<String> owned, Set<String> equipped) {
         ownedCosmetics.clear(); equippedCosmetics.clear();
         if (owned != null) ownedCosmetics.addAll(owned);
