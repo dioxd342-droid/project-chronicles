@@ -1,6 +1,7 @@
 package com.projectchronicles.core;
 
 import com.projectchronicles.core.command.ChroniclesCommand;
+import com.projectchronicles.core.cosmetic.CosmeticListener;
 import com.projectchronicles.core.cosmetic.CosmeticService;
 import com.projectchronicles.core.decision.DecisionService;
 import com.projectchronicles.core.donation.DonationService;
@@ -36,9 +37,12 @@ public final class ChroniclesPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this);
         getServer().getPluginManager().registerEvents(new NpcInteractionListener(this, npcService), this);
-        npcService.spawnStorytellerIfNeeded(); worldEventService.start(); getLogger().info("Project Chronicles loaded.");
+        getServer().getPluginManager().registerEvents(new CosmeticListener(this, cosmeticService), this);
+        npcService.spawnStorytellerIfNeeded(); worldEventService.start();
+        getServer().getScheduler().runTaskTimer(this, cosmeticService::tickEffects, 20L, 10L);
+        getLogger().info("Project Chronicles loaded.");
     }
-    @Override public void onDisable() { if (worldEventService != null) worldEventService.stop(); if (playerManager != null) playerManager.shutdown(); if (cosmeticService != null) getServer().getOnlinePlayers().forEach(cosmeticService::save); }
+    @Override public void onDisable() { if (worldEventService != null) worldEventService.stop(); if (playerManager != null) playerManager.shutdown(); }
     public PlayerManager getPlayerManager() { return playerManager; } public ExperienceService getExperienceService() { return experienceService; }
     public EconomyService getEconomyService() { return economyService; } public QuestService getQuestService() { return questService; }
     public FactionService getFactionService() { return factionService; } public WorldEventService getWorldEventService() { return worldEventService; }
