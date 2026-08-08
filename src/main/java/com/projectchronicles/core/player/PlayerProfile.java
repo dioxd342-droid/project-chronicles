@@ -16,43 +16,30 @@ public final class PlayerProfile {
         this.balance = Math.max(0, balance);
     }
 
-    public UUID getUniqueId() {
-        return uniqueId;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public long getExperience() {
-        return experience;
-    }
-
-    public long getBalance() {
-        return balance;
-    }
+    public UUID getUniqueId() { return uniqueId; }
+    public int getLevel() { return level; }
+    public long getExperience() { return experience; }
+    public long getBalance() { return balance; }
 
     public void addExperience(long amount) {
-        if (amount > 0) {
-            experience += amount;
-        }
+        if (amount > 0) experience += amount;
     }
 
-    public void setLevel(int level) {
-        this.level = Math.max(1, level);
+    public boolean removeExperience(long amount) {
+        if (amount <= 0 || experience < amount) return false;
+        experience -= amount;
+        return true;
     }
+
+    public void setLevel(int level) { this.level = Math.max(1, level); }
 
     public boolean withdraw(long amount) {
-        if (amount <= 0 || balance < amount) {
-            return false;
-        }
+        if (amount <= 0 || balance < amount) return false;
         balance -= amount;
         return true;
     }
 
     public void deposit(long amount) {
-        if (amount > 0) {
-            balance += amount;
-        }
+        if (amount > 0) balance += amount;
     }
 }
