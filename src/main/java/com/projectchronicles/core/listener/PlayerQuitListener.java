@@ -9,7 +9,7 @@ public final class PlayerQuitListener implements Listener {
     private final ChroniclesPlugin plugin;
     public PlayerQuitListener(ChroniclesPlugin plugin) { this.plugin = plugin; }
     @EventHandler public void onQuit(PlayerQuitEvent event) {
-        plugin.getCosmeticService().unload(event.getPlayer());
+        plugin.getCosmeticPetService().remove(event.getPlayer());
         plugin.getPlayerManager().remove(event.getPlayer().getUniqueId());
     }
 }
