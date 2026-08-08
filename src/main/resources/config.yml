@@ -27,3 +27,18 @@ npc:
 world-events:
   enabled: true
   broadcast: true
+
+donation:
+  enabled: true
+  store-url: 'https://YOUR-CHRONICLES-STORE.tebex.io'
+  provider: 'Tebex'
+  packages:
+    scout:
+      display-name: 'Хроникёр'
+      description: 'Косметические возможности и поддержка проекта.'
+    guardian:
+      display-name: 'Хранитель'
+      description: 'Дополнительные косметические возможности и поддержка проекта.'
+    founder:
+      display-name: 'Основатель'
+      description: 'Премиальный косметический набор для поддержки проекта.'
