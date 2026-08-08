@@ -2,6 +2,7 @@ package com.projectchronicles.core;
 
 import com.projectchronicles.core.command.ChroniclesCommand;
 import com.projectchronicles.core.decision.DecisionService;
+import com.projectchronicles.core.donation.DonationService;
 import com.projectchronicles.core.economy.EconomyService;
 import com.projectchronicles.core.faction.FactionService;
 import com.projectchronicles.core.listener.PlayerActivityListener;
@@ -24,6 +25,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
     private NpcService npcService;
     private WorldEventService worldEventService;
     private DecisionService decisionService;
+    private DonationService donationService;
 
     @Override public void onEnable() {
         saveDefaultConfig();
@@ -35,6 +37,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
         npcService = new NpcService(this);
         worldEventService = new WorldEventService(this);
         decisionService = new DecisionService(this);
+        donationService = new DonationService(this);
 
         ChroniclesCommand command = new ChroniclesCommand(this);
         if (getCommand("chronicles") != null) {
@@ -63,4 +66,5 @@ public final class ChroniclesPlugin extends JavaPlugin {
     public FactionService getFactionService() { return factionService; }
     public WorldEventService getWorldEventService() { return worldEventService; }
     public DecisionService getDecisionService() { return decisionService; }
+    public DonationService getDonationService() { return donationService; }
 }
