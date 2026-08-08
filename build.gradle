@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.projectchronicles'
+version = '0.1.0-SNAPSHOT'
+
+description = 'Project Chronicles Minecraft server plugin'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:26.2-R0.1-SNAPSHOT'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties props
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
