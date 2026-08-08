@@ -1,67 +1,104 @@
 package com.projectchronicles.core.cosmetic;
 
 import com.projectchronicles.core.ChroniclesPlugin;
+import com.projectchronicles.core.player.PlayerProfile;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public final class CosmeticService {
+    public static final String GUI_TITLE = "§6Project Chronicles §8• §fКосметика";
     private final ChroniclesPlugin plugin;
-    private final CosmeticDataStore store;
-    private final Map<UUID, Set<String>> owned = new HashMap<>();
-    private final Map<UUID, Set<String>> equipped = new HashMap<>();
     private final List<Cosmetic> cosmetics = List.of(
-            new Cosmetic("title_chronikler", "Титул Хроникёр", "Золотой титул поддержки проекта.", Cosmetic.CosmeticType.TITLE),
-            new Cosmetic("title_guardian", "Титул Хранитель", "Бирюзовый титул.", Cosmetic.CosmeticType.TITLE),
-            new Cosmetic("title_founder", "Титул Основатель", "Особый титул ранних игроков.", Cosmetic.CosmeticType.TITLE),
+            new Cosmetic("title_chronikler", "Хроникёр", "Золотой титул поддержки проекта.", Cosmetic.CosmeticType.TITLE),
+            new Cosmetic("title_guardian", "Хранитель", "Бирюзовый титул.", Cosmetic.CosmeticType.TITLE),
+            new Cosmetic("title_founder", "Основатель", "Особый титул ранних игроков.", Cosmetic.CosmeticType.TITLE),
             new Cosmetic("particle_embers", "Искры", "Косметические искры вокруг игрока.", Cosmetic.CosmeticType.PARTICLE),
             new Cosmetic("particle_stars", "Звёздная пыль", "Мягкий звёздный эффект.", Cosmetic.CosmeticType.PARTICLE),
             new Cosmetic("pet_wisp", "Дух-хранитель", "Косметический спутник игрока.", Cosmetic.CosmeticType.PET)
     );
-
-    public CosmeticService(ChroniclesPlugin plugin) { this.plugin = plugin; this.store = new CosmeticDataStore(plugin); }
+    public CosmeticService(ChroniclesPlugin plugin) { this.plugin = plugin; }
     public List<Cosmetic> getCosmetics() { return cosmetics; }
 
-    private void load(Player player) {
-        UUID uuid = player.getUniqueId();
-        if (owned.containsKey(uuid)) return;
-        CosmeticDataStore.Data data = store.load(uuid);
-        owned.put(uuid, new HashSet<>(data.owned()));
-        equipped.put(uuid, new HashSet<>(data.equipped()));
+    public void openMenu(Player player) {
+        Inventory inv = Bukkit.createInventory(null, 27, GUI_TITLE);
+        PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
+        for (int i = 0; i < cosmetics.size(); i++) {
+            Cosmetic cosmetic = cosmetics.get(i);
+            Material material = cosmetic.type() == Cosmetic.CosmeticType.TITLE ? Material.NAME_TAG : cosmetic.type() == Cosmetic.CosmeticType.PARTICLE ? Material.GLOWSTONE_DUST : Material.AMETHYST_SHARD;
+            ItemStack item = new ItemStack(material);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName((profile.ownsCosmetic(cosmetic.id()) ? "§a" : "§7§m") + cosmetic.name());
+            meta.setLore(List.of(
+                    "§7" + cosmetic.description(),
+                    "",
+                    profile.ownsCosmetic(cosmetic.id()) ? (profile.getEquippedCosmetics().contains(cosmetic.id()) ? "§eНажми, чтобы снять" : "§aНажми, чтобы надеть") : "§cНе получено"
+            ));
+            meta.getPersistentDataContainer().set(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING, cosmetic.id());
+            item.setItemMeta(meta);
+            inv.setItem(i + 10, item);
+        }
+        player.openInventory(inv);
     }
-    public boolean grant(Player player, String id) {
-        load(player); Cosmetic cosmetic = find(id);
-        if (cosmetic == null) return false;
-        boolean added = owned.get(player.getUniqueId()).add(id);
-        save(player); return added;
-    }
-    public boolean equip(Player player, String id) {
-        load(player); Cosmetic cosmetic = find(id);
-        if (cosmetic == null || !owned.get(player.getUniqueId()).contains(id)) return false;
-        equipped.get(player.getUniqueId()).add(id); save(player); return true;
-    }
-    public boolean unequip(Player player, String id) {
-        load(player); boolean removed = equipped.get(player.getUniqueId()).remove(id); save(player); return removed;
-    }
-    public Set<String> getOwned(Player player) { load(player); return Set.copyOf(owned.get(player.getUniqueId())); }
-    public Set<String> getEquipped(Player player) { load(player); return Set.copyOf(equipped.get(player.getUniqueId())); }
-    public Cosmetic find(String id) { return cosmetics.stream().filter(c -> c.id().equalsIgnoreCase(id)).findFirst().orElse(null); }
-    public void save(Player player) { UUID uuid = player.getUniqueId(); store.save(uuid, owned.getOrDefault(uuid, Set.of()), equipped.getOrDefault(uuid, Set.of())); }
-    public void unload(Player player) { save(player); UUID uuid = player.getUniqueId(); owned.remove(uuid); equipped.remove(uuid); }
 
-    public void showCollection(Player player) {
-        load(player); Set<String> playerOwned = owned.get(player.getUniqueId()); Set<String> playerEquipped = equipped.get(player.getUniqueId());
-        player.sendMessage(ChatColor.GOLD + "=== Коллекция Chronicles ===");
-        for (Cosmetic cosmetic : cosmetics) {
-            boolean has = playerOwned.contains(cosmetic.id()); boolean active = playerEquipped.contains(cosmetic.id());
-            player.sendMessage((has ? ChatColor.GREEN + "✓ " : ChatColor.RED + "✗ ") + cosmetic.name() + (active ? ChatColor.AQUA + " [НАДЕТО]" : ""));
-            player.sendMessage(ChatColor.GRAY + "  " + cosmetic.id() + " — " + cosmetic.description());
+    public void handleClick(Player player, ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return;
+        String id = item.getItemMeta().getPersistentDataContainer().get(new org.bukkit.NamespacedKey(plugin, "cosmetic"), org.bukkit.persistence.PersistentDataType.STRING);
+        if (id == null) return;
+        PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
+        Cosmetic cosmetic = cosmetics.stream().filter(c -> c.id().equals(id)).findFirst().orElse(null);
+        if (cosmetic == null || !profile.ownsCosmetic(id)) {
+            player.sendMessage("§cЭта косметика ещё не принадлежит тебе.");
+            return;
+        }
+        if (profile.getEquippedCosmetics().contains(id)) {
+            profile.unequipCosmetic(id);
+            player.sendMessage("§7Косметика снята: §f" + cosmetic.name());
+        } else {
+            if (cosmetic.type() == Cosmetic.CosmeticType.TITLE) {
+                profile.getEquippedCosmetics().stream().filter(existing -> existing.startsWith("title_")).toList().forEach(profile::unequipCosmetic);
+            }
+            if (cosmetic.type() == Cosmetic.CosmeticType.PARTICLE) {
+                profile.getEquippedCosmetics().stream().filter(existing -> existing.startsWith("particle_")).toList().forEach(profile::unequipCosmetic);
+            }
+            profile.equipCosmetic(id);
+            player.sendMessage("§aКосметика надета: §f" + cosmetic.name());
+        }
+        apply(player);
+        openMenu(player);
+    }
+
+    public void grant(Player player, String id) {
+        Cosmetic cosmetic = cosmetics.stream().filter(c -> c.id().equals(id)).findFirst().orElse(null);
+        if (cosmetic == null) { player.sendMessage("§cНеизвестная косметика: " + id); return; }
+        plugin.getPlayerManager().getProfile(player.getUniqueId()).grantCosmetic(id);
+        player.sendMessage("§aПолучена косметика: §f" + cosmetic.name());
+    }
+
+    public void apply(Player player) {
+        PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
+        String title = profile.getEquippedCosmetics().stream().filter(id -> id.startsWith("title_")).findFirst().orElse(null);
+        String prefix = title == null ? "" : switch (title) {
+            case "title_chronikler" -> "§6[Хроникёр] §r";
+            case "title_guardian" -> "§b[Хранитель] §r";
+            case "title_founder" -> "§d[Основатель] §r";
+            default -> "";
+        };
+        player.setPlayerListName(prefix + player.getName());
+    }
+
+    public void tickEffects() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
+            if (profile.getEquippedCosmetics().contains("particle_embers")) player.getWorld().spawnParticle(Particle.FLAME, player.getLocation().add(0, 1, 0), 3, .25, .35, .25, .01);
+            if (profile.getEquippedCosmetics().contains("particle_stars")) player.getWorld().spawnParticle(Particle.END_ROD, player.getLocation().add(0, 1.2, 0), 2, .3, .4, .3, .01);
         }
     }
 }
