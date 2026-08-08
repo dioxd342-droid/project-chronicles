@@ -5,6 +5,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public final class PlayerDataStore {
@@ -29,17 +31,17 @@ public final class PlayerDataStore {
         long experience = plugin.getConfig().getLong("profile.starting-experience", 0);
         long balance = plugin.getConfig().getLong("economy.starting-balance", 100);
 
-        if (!file.exists()) {
-            return new PlayerProfile(uniqueId, level, experience, balance);
-        }
+        if (!file.exists()) return new PlayerProfile(uniqueId, level, experience, balance);
 
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
-        return new PlayerProfile(
+        PlayerProfile profile = new PlayerProfile(
                 uniqueId,
                 data.getInt("level", level),
                 data.getLong("experience", experience),
                 data.getLong("balance", balance)
         );
+        profile.loadCompletedQuests(new HashSet<>(data.getStringList("quests.completed")));
+        return profile;
     }
 
     public void save(PlayerProfile profile) {
@@ -49,6 +51,7 @@ public final class PlayerDataStore {
         data.set("level", profile.getLevel());
         data.set("experience", profile.getExperience());
         data.set("balance", profile.getBalance());
+        data.set("quests.completed", profile.getCompletedQuests());
 
         try {
             data.save(file);
