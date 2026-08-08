@@ -1,5 +1,6 @@
 package com.projectchronicles.core;
 
+import com.projectchronicles.core.combat.ClassService;
 import com.projectchronicles.core.command.ChroniclesCommand;
 import com.projectchronicles.core.cosmetic.CosmeticListener;
 import com.projectchronicles.core.cosmetic.CosmeticPetService;
@@ -23,14 +24,14 @@ import com.projectchronicles.core.world.WorldEventService;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChroniclesPlugin extends JavaPlugin {
-    private PlayerManager playerManager; private ExperienceService experienceService; private AbilityService abilityService; private EconomyService economyService;
+    private PlayerManager playerManager; private ExperienceService experienceService; private AbilityService abilityService; private ClassService classService; private EconomyService economyService;
     private QuestService questService; private ProgressQuestService progressQuestService; private FactionService factionService; private NpcService npcService;
     private WorldEventService worldEventService; private DecisionService decisionService; private DonationService donationService;
     private CosmeticService cosmeticService; private CosmeticPetService cosmeticPetService;
 
     @Override public void onEnable() {
         saveDefaultConfig(); playerManager = new PlayerManager(this); playerManager.initialize();
-        experienceService = new ExperienceService(this); abilityService = new AbilityService(this); economyService = new EconomyService(this);
+        experienceService = new ExperienceService(this); abilityService = new AbilityService(this); classService = new ClassService(this); economyService = new EconomyService(this);
         questService = new QuestService(this); progressQuestService = new ProgressQuestService(this); factionService = new FactionService(this); npcService = new NpcService(this);
         worldEventService = new WorldEventService(this); decisionService = new DecisionService(this); donationService = new DonationService(this);
         cosmeticService = new CosmeticService(this); cosmeticPetService = new CosmeticPetService(this);
@@ -48,7 +49,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
         getLogger().info("Project Chronicles loaded.");
     }
     @Override public void onDisable() { if (worldEventService != null) worldEventService.stop(); if (cosmeticPetService != null) cosmeticPetService.shutdown(); if (playerManager != null) playerManager.shutdown(); }
-    public PlayerManager getPlayerManager() { return playerManager; } public ExperienceService getExperienceService() { return experienceService; } public AbilityService getAbilityService() { return abilityService; }
+    public PlayerManager getPlayerManager() { return playerManager; } public ExperienceService getExperienceService() { return experienceService; } public AbilityService getAbilityService() { return abilityService; } public ClassService getClassService() { return classService; }
     public EconomyService getEconomyService() { return economyService; } public QuestService getQuestService() { return questService; } public ProgressQuestService getProgressQuestService() { return progressQuestService; }
     public FactionService getFactionService() { return factionService; } public WorldEventService getWorldEventService() { return worldEventService; } public DecisionService getDecisionService() { return decisionService; }
     public DonationService getDonationService() { return donationService; } public CosmeticService getCosmeticService() { return cosmeticService; } public CosmeticPetService getCosmeticPetService() { return cosmeticPetService; }
