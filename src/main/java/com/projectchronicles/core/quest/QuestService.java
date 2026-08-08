@@ -15,17 +15,9 @@ public final class QuestService {
             new Quest("survivor", "Выживший", "Достигни второго уровня.", 100, 75)
     );
 
-    public QuestService(ChroniclesPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    public List<Quest> getQuests() {
-        return quests;
-    }
-
-    public Quest getQuest(String id) {
-        return quests.stream().filter(q -> q.id().equalsIgnoreCase(id)).findFirst().orElse(null);
-    }
+    public QuestService(ChroniclesPlugin plugin) { this.plugin = plugin; }
+    public List<Quest> getQuests() { return quests; }
+    public Quest getQuest(String id) { return quests.stream().filter(q -> q.id().equalsIgnoreCase(id)).findFirst().orElse(null); }
 
     public boolean canComplete(Quest quest, Player player) {
         PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
@@ -41,8 +33,8 @@ public final class QuestService {
 
         PlayerProfile profile = plugin.getPlayerManager().getProfile(player.getUniqueId());
         profile.completeQuest(quest.id());
-        profile.addExperience(quest.experienceReward());
-        profile.deposit(quest.moneyReward());
+        plugin.getExperienceService().addExperience(player, quest.experienceReward());
+        plugin.getEconomyService().deposit(player.getUniqueId(), quest.moneyReward());
         plugin.getPlayerManager().saveProfile(player.getUniqueId());
 
         player.sendMessage(ChatColor.GOLD + "✦ Квест выполнен: " + ChatColor.YELLOW + quest.title());
