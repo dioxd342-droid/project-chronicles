@@ -5,48 +5,48 @@
 ## Implemented foundation
 
 - Paper 26.2 / Java 25
-- Gradle build
-- Automated GitHub Actions build
+- Gradle build + automated GitHub Actions build
 - Persistent YAML player profiles
 - Level and XP progression with configurable maximum level
-- XP from world activity (mining and combat)
+- XP from world activity
 - Persistent player economy
-- `/chronicles profile`
-- `/chronicles balance`
-- `/chronicles quests`
-- `/chronicles claim <id>`
-- `/chronicles info`
-- First-join introductory quest
-- Quest rewards in XP and currency
-- Player join/quit lifecycle
-- Permissions for player and admin commands
+- Quest system with first-adventure content and rewards
+- Faction framework with persistent reputation
+- Branching introductory choice: Wardens or Free Traders
+- Story NPC framework using native Paper/Bukkit entities
+- First storyteller NPC with interactive dialogue
+- Recurring dynamic world-event engine
+- Player join/quit lifecycle and permissions
 
 ## Core vision
 
-Chronicles is being built around one central idea: **player actions should matter**. The long-term architecture therefore separates player data, progression, economy, quests and world systems so they can later influence one another without turning the project into a single giant class.
+Chronicles is built around one central idea: **player actions should matter**.
+
+A player's progression, money, quests, faction relationships and decisions are designed to become inputs into a living world rather than isolated features.
+
+## Current player experience
+
+1. Join the server and receive your first adventure.
+2. Meet **Elian, Keeper of Chronicles** near spawn.
+3. Choose a side: **Wardens** or **Free Traders**.
+4. Gain reputation and unlock different future paths.
+5. Watch world events appear while the server is alive.
+6. Continue building a character whose decisions persist.
 
 ## Roadmap
 
-### Phase 1 — Foundation
+### Living world
 
-- [x] Plugin lifecycle
-- [x] Player persistence
-- [x] Progression
-- [x] Economy
-- [x] Quests
-- [x] Activity rewards
-- [x] Automated builds
+- [x] NPC framework and dialogue
+- [x] Factions and reputation foundation
+- [x] Persistent player choices foundation
+- [x] Dynamic world events foundation
+- [ ] Multi-stage dialogue trees
+- [ ] Quest objectives driven by world state
+- [ ] Region state and faction control
+- [ ] Consequences that alter NPCs, prices and quests
 
-### Phase 2 — Living world
-
-- [ ] NPC framework and dialogue
-- [ ] Quest objectives beyond simple state checks
-- [ ] World events
-- [ ] Factions and reputation
-- [ ] Player choices with persistent consequences
-- [ ] Region/world state
-
-### Phase 3 — MMORPG systems
+### MMORPG systems
 
 - [ ] Items and equipment
 - [ ] Skills/classes
@@ -54,9 +54,11 @@ Chronicles is being built around one central idea: **player actions should matte
 - [ ] Parties
 - [ ] Dungeons
 - [ ] Boss encounters
+- [ ] Crafting and professions
+- [ ] Achievements
 - [ ] Anti-abuse and economy balancing
 
-### Phase 4 — Production
+### Production
 
 - [ ] Database-backed storage
 - [ ] Async persistence
@@ -71,18 +73,16 @@ Chronicles is being built around one central idea: **player actions should matte
 - `/chronicles balance`
 - `/chronicles quests`
 - `/chronicles claim <id>`
+- `/chronicles factions`
+- `/chronicles choose <wardens|traders>`
 - `/chronicles xp <amount>` — admin testing command
 
 ## Build
 
-The GitHub Actions workflow builds the plugin automatically. Locally, use Java 25 and Gradle:
+Use Java 25 and Gradle. The GitHub Actions workflow builds the plugin automatically.
 
-```bash
-gradle build
-```
-
-The plugin JAR is generated in `build/libs/`.
+The resulting plugin JAR is generated in `build/libs/`.
 
 ## Status
 
-🚧 Active development — MMORPG foundation is taking shape.
+🚧 Active development — Chronicles is becoming a living MMORPG rather than a collection of commands.
