@@ -1,6 +1,7 @@
 package com.projectchronicles.core;
 
 import com.projectchronicles.core.command.ChroniclesCommand;
+import com.projectchronicles.core.cosmetic.CosmeticService;
 import com.projectchronicles.core.decision.DecisionService;
 import com.projectchronicles.core.donation.DonationService;
 import com.projectchronicles.core.economy.EconomyService;
@@ -26,6 +27,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
     private WorldEventService worldEventService;
     private DecisionService decisionService;
     private DonationService donationService;
+    private CosmeticService cosmeticService;
 
     @Override public void onEnable() {
         saveDefaultConfig();
@@ -38,6 +40,7 @@ public final class ChroniclesPlugin extends JavaPlugin {
         worldEventService = new WorldEventService(this);
         decisionService = new DecisionService(this);
         donationService = new DonationService(this);
+        cosmeticService = new CosmeticService(this);
 
         ChroniclesCommand command = new ChroniclesCommand(this);
         if (getCommand("chronicles") != null) {
@@ -67,4 +70,5 @@ public final class ChroniclesPlugin extends JavaPlugin {
     public WorldEventService getWorldEventService() { return worldEventService; }
     public DecisionService getDecisionService() { return decisionService; }
     public DonationService getDonationService() { return donationService; }
+    public CosmeticService getCosmeticService() { return cosmeticService; }
 }
