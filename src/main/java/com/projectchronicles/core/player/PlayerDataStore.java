@@ -1,7 +1,6 @@
 package com.projectchronicles.core.player;
 
 import com.projectchronicles.core.ChroniclesPlugin;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -26,18 +25,20 @@ public final class PlayerDataStore {
 
     public PlayerProfile load(UUID uniqueId) {
         File file = new File(directory, uniqueId + ".yml");
-        int defaultLevel = plugin.getConfig().getInt("profile.starting-level", 1);
-        long defaultExperience = plugin.getConfig().getLong("profile.starting-experience", 0);
+        int level = plugin.getConfig().getInt("profile.starting-level", 1);
+        long experience = plugin.getConfig().getLong("profile.starting-experience", 0);
+        long balance = plugin.getConfig().getLong("economy.starting-balance", 100);
 
         if (!file.exists()) {
-            return new PlayerProfile(uniqueId, defaultLevel, defaultExperience);
+            return new PlayerProfile(uniqueId, level, experience, balance);
         }
 
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
         return new PlayerProfile(
                 uniqueId,
-                data.getInt("level", defaultLevel),
-                data.getLong("experience", defaultExperience)
+                data.getInt("level", level),
+                data.getLong("experience", experience),
+                data.getLong("balance", balance)
         );
     }
 
@@ -47,18 +48,12 @@ public final class PlayerDataStore {
         data.set("uuid", profile.getUniqueId().toString());
         data.set("level", profile.getLevel());
         data.set("experience", profile.getExperience());
+        data.set("balance", profile.getBalance());
 
         try {
             data.save(file);
         } catch (IOException exception) {
             plugin.getLogger().severe("Could not save profile " + profile.getUniqueId() + ": " + exception.getMessage());
-        }
-    }
-
-    public void delete(UUID uniqueId) {
-        File file = new File(directory, uniqueId + ".yml");
-        if (file.exists() && !file.delete()) {
-            plugin.getLogger().warning("Could not delete profile: " + uniqueId);
         }
     }
 }
