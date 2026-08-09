@@ -13,6 +13,8 @@ import com.projectchronicles.core.faction.FactionService;
 import com.projectchronicles.core.listener.PlayerActivityListener;
 import com.projectchronicles.core.listener.PlayerJoinListener;
 import com.projectchronicles.core.listener.PlayerQuitListener;
+import com.projectchronicles.core.loot.LootListener;
+import com.projectchronicles.core.loot.LootService;
 import com.projectchronicles.core.npc.NpcInteractionListener;
 import com.projectchronicles.core.npc.NpcService;
 import com.projectchronicles.core.player.AbilityService;
@@ -28,31 +30,25 @@ public final class ChroniclesPlugin extends JavaPlugin {
     private PlayerManager playerManager; private ExperienceService experienceService; private AbilityService abilityService; private ClassService classService; private EconomyService economyService;
     private QuestService questService; private ProgressQuestService progressQuestService; private FactionService factionService; private NpcService npcService;
     private WorldEventService worldEventService; private DecisionService decisionService; private DonationService donationService;
-    private CosmeticService cosmeticService; private CosmeticPetService cosmeticPetService;
+    private CosmeticService cosmeticService; private CosmeticPetService cosmeticPetService; private LootService lootService;
 
     @Override public void onEnable() {
         saveDefaultConfig(); playerManager = new PlayerManager(this); playerManager.initialize();
-        experienceService = new ExperienceService(this); abilityService = new AbilityService(this); classService = new ClassService(this); economyService = new EconomyService(this);
+        experienceService = new ExperienceService(this); abilityService = new AbilityService(this); classService = new ClassService(this); economyService = new EconomyService(this); lootService = new LootService();
         questService = new QuestService(this); progressQuestService = new ProgressQuestService(this); factionService = new FactionService(this); npcService = new NpcService(this);
         worldEventService = new WorldEventService(this); decisionService = new DecisionService(this); donationService = new DonationService(this);
         cosmeticService = new CosmeticService(this); cosmeticPetService = new CosmeticPetService(this);
         ChroniclesCommand command = new ChroniclesCommand(this);
         if (getCommand("chronicles") != null) { getCommand("chronicles").setExecutor(command); getCommand("chronicles").setTabCompleter(command); } else getLogger().severe("Command 'chronicles' is missing from plugin.yml");
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this);
-        getServer().getPluginManager().registerEvents(new CombatListener(this), this);
-        getServer().getPluginManager().registerEvents(new NpcInteractionListener(this, npcService), this);
-        getServer().getPluginManager().registerEvents(new CosmeticListener(this, cosmeticService), this);
-        getServer().getPluginManager().registerEvents(new ProgressQuestListener(this, progressQuestService), this);
-        npcService.spawnStorytellerIfNeeded(); worldEventService.start();
-        getServer().getScheduler().runTaskTimer(this, cosmeticService::tickEffects, 20L, 10L);
-        getServer().getScheduler().runTaskTimer(this, cosmeticPetService::tick, 20L, 10L);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this); getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerActivityListener(this), this); getServer().getPluginManager().registerEvents(new CombatListener(this), this); getServer().getPluginManager().registerEvents(new LootListener(this), this);
+        getServer().getPluginManager().registerEvents(new NpcInteractionListener(this, npcService), this); getServer().getPluginManager().registerEvents(new CosmeticListener(this, cosmeticService), this); getServer().getPluginManager().registerEvents(new ProgressQuestListener(this, progressQuestService), this);
+        npcService.spawnStorytellerIfNeeded(); worldEventService.start(); getServer().getScheduler().runTaskTimer(this, cosmeticService::tickEffects, 20L, 10L); getServer().getScheduler().runTaskTimer(this, cosmeticPetService::tick, 20L, 10L);
         getLogger().info("Project Chronicles loaded.");
     }
     @Override public void onDisable() { if (worldEventService != null) worldEventService.stop(); if (cosmeticPetService != null) cosmeticPetService.shutdown(); if (playerManager != null) playerManager.shutdown(); }
     public PlayerManager getPlayerManager() { return playerManager; } public ExperienceService getExperienceService() { return experienceService; } public AbilityService getAbilityService() { return abilityService; } public ClassService getClassService() { return classService; }
-    public EconomyService getEconomyService() { return economyService; } public QuestService getQuestService() { return questService; } public ProgressQuestService getProgressQuestService() { return progressQuestService; }
-    public FactionService getFactionService() { return factionService; } public WorldEventService getWorldEventService() { return worldEventService; } public DecisionService getDecisionService() { return decisionService; }
-    public DonationService getDonationService() { return donationService; } public CosmeticService getCosmeticService() { return cosmeticService; } public CosmeticPetService getCosmeticPetService() { return cosmeticPetService; }
+    public EconomyService getEconomyService() { return economyService; } public QuestService getQuestService() { return questService; } public ProgressQuestService getProgressQuestService() { return progressQuestService; } public FactionService getFactionService() { return factionService; }
+    public WorldEventService getWorldEventService() { return worldEventService; } public DecisionService getDecisionService() { return decisionService; } public DonationService getDonationService() { return donationService; } public CosmeticService getCosmeticService() { return cosmeticService; }
+    public CosmeticPetService getCosmeticPetService() { return cosmeticPetService; } public LootService getLootService() { return lootService; }
 }
